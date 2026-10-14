@@ -89,6 +89,11 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- Core Neovim settings, leaders, options, basic keymaps, basic autocmds
 -- ============================================================
 do
+  vim.opt.termguicolors = true
+
+  -- No start screen
+  vim.opt.shortmess:append("I")
+
   -- Enable faster startup by caching compiled Lua modules
   vim.loader.enable()
 
@@ -98,8 +103,11 @@ do
   vim.g.mapleader = ' '
   vim.g.maplocalleader = ' '
 
+  vim.keymap.set({'n', 'v'}, '.', ':')
+  vim.keymap.set({'n', 'v'}, ',', ';')
+
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -171,6 +179,18 @@ do
   -- instead raise a dialog asking if you wish to save the current file(s)
   -- See `:help 'confirm'`
   vim.o.confirm = true
+
+  -- Configure tab for specific file types
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "sh", "bash", "py"},
+    callback = function()
+      vim.opt_local.expandtab = true
+      vim.opt_local.shiftwidth = 4
+      vim.opt_local.tabstop = 4
+      vim.opt_local.softtabstop = 4
+    end,
+  })
+
 end
 
 -- ============================================================
@@ -180,6 +200,10 @@ end
 do
   -- [[ Basic Keymaps ]]
   --  See `:help vim.keymap.set()`
+
+  -- New line with Enter in normal mode
+  vim.keymap.set('n', '<CR>', 'o<Esc>k')
+  vim.keymap.set('n', '<S-CR>', 'O<Esc>j')
 
   -- Clear highlights on search when pressing <Esc> in normal mode
   --  See `:help hlsearch`
@@ -336,7 +360,7 @@ do
   -- This will download the default branch of the plugin, which will usually be `main` or `master`
   -- You can also have more advanced specs, which we will talk about later.
   --
-  -- For most plugins its not enough to install them, you also need to call their `.setup()` to start them.
+  -- For most plugins its not enough to install them, you also need to call their `.setup()` to start them
   --
   -- For example, lets say we want to install `guess-indent.nvim` - a plugin for
   -- automatically detecting and setting the indentation.
@@ -361,9 +385,16 @@ do
     },
   }
 
-  -- Useful plugin to show you pending keybinds.
+  -- Useful plugin to show you pending keybinds
   vim.pack.add { gh 'folke/which-key.nvim' }
   require('which-key').setup {
+    -- Trigger which-key on these keymaps
+    triggers = {
+      -- keep the defaults (adjust modes if you use the broader default)
+      { "<auto>", mode = "nxso" },
+      -- add f (builtin find)
+      { "f", mode = { "n" } },
+    },
     -- Delay between pressing a key and opening which-key (milliseconds)
     delay = 0,
     icons = { mappings = vim.g.have_nerd_font },
@@ -372,38 +403,246 @@ do
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
-      { 'gr', group = 'LSP Actions', mode = { 'n' } },
+      { 'f', group = 'LSP Actions', mode = { 'n' } },
     },
   }
+  -- Set highlights separately
+  vim.api.nvim_set_hl(0, 'WhichKey', { fg = '#ff6b6b' })
+  vim.api.nvim_set_hl(0, 'WhichKeyDesc', { fg = '#a7a7a7' })
+  vim.api.nvim_set_hl(0, 'WhichKeySeparator', { fg = '#a7a7a7' })
+  vim.api.nvim_set_hl(0, 'WhichKeyGroup', { fg = '#c678dd' })
+  vim.api.nvim_set_hl(0, 'WhichKeyValue', { fg = '#98c379' })
+
+  -- Install + configure diffview.nvim with vim.pack
+  vim.pack.add {
+    gh 'sindrets/diffview.nvim',
+    gh 'nvim-tree/nvim-web-devicons', -- optional dependency
+  }
+  require('diffview').setup {
+    default_args = {
+      DiffviewOpen = { '--imply-local' },
+    },
+    keymaps = {
+      view = {
+        { 'n', 'q', '<cmd>DiffviewClose<cr>', { desc = 'Close Diffview' } },
+      },
+      file_panel = {
+        { 'n', 'q', '<cmd>DiffviewClose<cr>', { desc = 'Close Diffview' } },
+      },
+    },
+  }
+  -- Keymaps
+  vim.keymap.set('n', 'gd', '<cmd>DiffviewOpen -- %<cr>',
+    { desc = 'Diff current file vs previous commit' })
+  vim.keymap.set('n', 'gD', '<cmd>DiffviewOpen <cr>',
+    { desc = 'Diff all files vs previous commit' })
+  vim.keymap.set('n', 'ga', '<cmd>DiffviewOpen origin/devel<cr>',
+    { desc = 'Diff all files vs devel' })
 
   -- [[ Colorscheme ]]
-  -- You can easily change to a different colorscheme.
+  -- You can easily change to a different colorscheme
   -- Change the name of the colorscheme plugin below, and then
-  -- change the command under that to load whatever the name of that colorscheme is.
+  -- change the command under that to load whatever the name of that colorscheme is
   --
-  -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  vim.pack.add { gh 'folke/tokyonight.nvim' }
-  ---@diagnostic disable-next-line: missing-fields
-  require('tokyonight').setup {
-    styles = {
-      comments = { italic = false }, -- Disable italics in comments
-    },
-  }
-
+  -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`
   -- Load the colorscheme here.
-  -- Like many other themes, this one has different styles, and you could load
-  -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
 
-  -- Highlight todo, notes, etc in comments
-  vim.pack.add { gh 'folke/todo-comments.nvim' }
-  require('todo-comments').setup { signs = false }
+  local hl = vim.api.nvim_set_hl
+
+  -- Cursor color
+  hl(0, 'CursorLineNr', { fg = '#FFD300', bg = '#2C323C', bold = true })
+
+  -- Background
+  hl(0, "Normal", { bg = "#181819" })
+
+  -- Custom: Python Tree-sitter highlighting overrides
+  -- Strings & related
+  hl(0, "@string.python",                 { fg = "#95ee98", italic = true })
+  hl(0, "@string.delimiter.python",       { fg = "#95ee98", italic = true })
+  hl(0, "@string.special.python",         { fg = "#95ee98", italic = true })
+  hl(0, "@string.escape.python",          { fg = "#ffaa22" })
+  -- Numbers
+  hl(0, "@number.python",                 { fg = "#1fc522" })
+  hl(0, "@number.float.python",           { fg = "#1fc522" })
+  -- Functions & Calls
+  hl(0, "@function.python",               { fg = "#be69ff" })
+  hl(0, "@function.call.python",          { fg = "#ccb9ff" })
+  hl(0, "@function.method.python",        { fg = "#be69ff" })
+  hl(0, "@function.method.call.python",   { fg = "#ccb9ff" })
+  -- Classes & Types
+  hl(0, "@type.python",                   { fg = "#7e91e4" })
+  -- Keywords
+  hl(0, "@keyword.python",                { fg = "#ffaa22" })
+  hl(0, "@keyword.function.python",       { fg = "#ffaa22", bold = true })
+  hl(0, "@keyword.operator.python",       { fg = "#ffaa22", bold = true })
+  hl(0, "@keyword.return.python",         { fg = "#ffaa22", bold = true })
+  hl(0, "@keyword.type.python",           { fg = "#ffaa22", bold = true })
+  hl(0, "@keyword.import.python",         { fg = "#ffaa22", bold = true })
+  hl(0, "@keyword.conditional.python",    { fg = "#ffd900", bold = true })
+  hl(0, "@keyword.exception.python",      { fg = "#ffd900", bold = true })
+  hl(0, "@keyword.repeat.python",         { fg = "#ffd900", bold = true })
+  -- Punctuation
+  hl(0, "@punctuation.special.python",      { fg = "#ffaa22" })
+  -- Operators
+  hl(0, "@operator.python",               { fg = "#ff33ee" })
+  -- Decorators
+  hl(0, "@attribute.python",              { fg = "#ffec7d" })
+  hl(0, "@decorator.python",              { fg = "#ffec7d" })
+  hl(0, "@attribute.builtin.python",      { fg = "#ffec7d" })
+  -- Comments
+  hl(0, "@comment.python",                { fg = "#a7a7a7" })
+  hl(0, "@spell.python",                  { fg = "#a7a7a7" })
+  hl(0, "@string.documentation.python",   { fg = "#a7a7a7" })
+  -- Special and Builtin
+  hl(0, "@variable.builtin.python",       { fg = "#8ccfe6" })
+  hl(0, "@boolean.python",                { fg = "#8ccfe6" })
+  hl(0, "@constant.builtin.python",       { fg = "#8ccfe6" })
+  hl(0, "@type.builtin.python",           { fg = "#8ccfe6" })
+  hl(0, "@function.builtin.python",       { fg = "#1ebea3" })
+  -- Exceptions
+  hl(0, "@exception.python",              { fg = "#da4453" })
+  -- Overloaders / Special
+  hl(0, '@function.magic.python',         { fg = "#f535b8" })
+  hl(0, '@constructor.python',            { fg = "#dc277f" })
+  -- Fallback / Normal text (rarely needed)
+  hl(0, "@text.python",                   { fg = "#ffffff" })
+
+  -- Custom: C Tree-sitter highlighting overrides
+  -- Strings & related
+  hl(0, "@string.c",                    { fg = "#95ee98", italic = true })
+  hl(0, "@string.delimiter.c",          { fg = "#95ee98", italic = true })
+  hl(0, "@string.special.c",            { fg = "#95ee98", italic = true })
+  hl(0, "@string.escape.c",             { fg = "#ffaa22" })
+  -- Numbers
+  hl(0, "@number.c",                    { fg = "#1fc522" })
+  hl(0, "@number.float.c",              { fg = "#1fc522" })
+  -- Functions & Calls
+  hl(0, "@function.c",                  { fg = "#be69ff" })
+  hl(0, "@function.call.c",             { fg = "#ccb9ff" })
+  hl(0, "@function.method.c",           { fg = "#be69ff" })
+  hl(0, "@function.method.call.c",      { fg = "#ccb9ff" })
+  -- Classes & Types
+  hl(0, "@type.c",                      { fg = "#7e91e4" })
+  -- Keywords
+  hl(0, "@keyword.c",                   { fg = "#ffaa22" })
+  hl(0, "@keyword.function.c",          { fg = "#ffaa22", bold = true })
+  hl(0, "@keyword.operator.c",          { fg = "#ffaa22", bold = true })
+  hl(0, "@keyword.return.c",            { fg = "#ffaa22", bold = true })
+  hl(0, "@keyword.type.c",              { fg = "#ffaa22", bold = true })
+  hl(0, "@keyword.import.c",            { fg = "#ffaa22", bold = true })   -- #include
+  hl(0, "@keyword.conditional.c",       { fg = "#ffd900", bold = true })
+  hl(0, "@keyword.exception.c",         { fg = "#ffd900", bold = true })   -- try/catch/throw
+  hl(0, "@keyword.repeat.c",            { fg = "#ffd900", bold = true })   -- for/while/do
+  hl(0, "@keyword.coroutine.c",         { fg = "#ffd900", bold = true })   -- co_await/co_return
+  hl(0, "@keyword.directive.c",         { fg = "#ffaa22", bold = true })   -- preprocessor
+  hl(0, "@keyword.directive.define.c",  { fg = "#ffaa22", bold = true })   -- #define
+  -- Punctuation
+  hl(0, "@punctuation.special.c",       { fg = "#ffaa22" })
+  hl(0, "@punctuation.delimiter.c",     { fg = "#c8c8c8" })
+  -- Operators
+  hl(0, "@operator.c",                  { fg = "#ff33ee" })
+  -- Attributes / Annotations ([[nodiscard]], alignas, etc.)
+  hl(0, "@attribute.c",                 { fg = "#ffec7d" })
+  hl(0, "@attribute.builtin.c",         { fg = "#ffec7d" })
+  -- Comments & Doxygen
+  hl(0, "@comment.c",                   { fg = "#a7a7a7" })
+  hl(0, "@spell.c",                     { fg = "#a7a7a7" })
+  hl(0, "@comment.documentation.c",     { fg = "#a7a7a7" })
+  -- Special and Builtin
+  hl(0, "@variable.builtin.c",          { fg = "#8ccfe6" })   -- this
+  hl(0, "@boolean.c",                   { fg = "#8ccfe6" })
+  hl(0, "@constant.builtin.c",          { fg = "#8ccfe6" })   -- nullptr, true, false
+  hl(0, "@type.builtin.c",              { fg = "#8ccfe6" })   -- int, char, size_t...
+  hl(0, "@function.builtin.c",          { fg = "#1ebea3" })
+  -- Exceptions (catch params, etc.)
+  hl(0, "@exception.c",                 { fg = "#da4453" })
+  -- Overloaders / Special
+  hl(0, '@function.magic.cpp',            { fg = "#f535b8" })   -- operator overloads
+  hl(0, '@constructor.cpp',               { fg = "#dc277f" })
+  -- Namespaces
+  hl(0, "@module.c",                    { fg = "#7e91e4" })
+  -- Fallback / Normal text
+  hl(0, "@text.c",                      { fg = "#ffffff" })
+
+  -- Custom: JSON Tree-sitter highlighting overrides
+  -- Strings (object keys AND string values both map here)
+  hl(0, "@string.json",                    { fg = "#95ee98", italic = true })
+  hl(0, "@string.delimiter.json",          { fg = "#95ee98", italic = true })
+  hl(0, "@string.special.json",            { fg = "#95ee98", italic = true })
+  hl(0, "@string.escape.json",             { fg = "#ffaa22" })   -- \" \\ \n \uXXXX
+  -- Object keys get their own capture in nvim-treesitter's JSON parser
+  hl(0, "@field.json",                     { fg = "#7e91e4" })   -- key names
+  hl(0, "@property.json",                  { fg = "#7e91e4" })   -- fallback alias
+  -- Numbers (int and float share @number in JSON)
+  hl(0, "@number.json",                    { fg = "#1fc522" })
+  hl(0, "@number.float.json",              { fg = "#1fc522" })
+  -- Booleans and null
+  hl(0, "@boolean.json",                   { fg = "#8ccfe6" })   -- true / false
+  hl(0, "@constant.builtin.json",          { fg = "#8ccfe6" })   -- null
+  -- Punctuation: { } [ ] , :
+  hl(0, "@punctuation.bracket.json",       { fg = "#c8c8c8" })
+  hl(0, "@punctuation.delimiter.json",     { fg = "#ffaa22" })   -- , and :
+  hl(0, "@punctuation.special.json",       { fg = "#ffaa22" })
+  -- Comments — NOT valid JSON, but many tools (JSONC, json5) allow them
+  hl(0, "@comment.json",                   { fg = "#a7a7a7" })
+  -- Fallback / Normal text
+  hl(0, "@text.json",                      { fg = "#ffffff" })
+
+  -- Custom: bash Tree-sitter highlighting overrides
+  -- Strings & related
+  hl(0, "@string.bash",                   { fg = "#95ee98", italic = true })
+  hl(0, "@string.delimiter.bash",         { fg = "#95ee98", italic = true })
+  hl(0, "@string.special.bash",           { fg = "#95ee98", italic = true })
+  hl(0, "@string.escape.bash",            { fg = "#ffaa22" })   -- \n \\ \$
+  -- Numbers
+  hl(0, "@number.bash",                   { fg = "#1fc522" })
+  -- Functions & Calls
+  hl(0, "@function.bash",                 { fg = "#be69ff" })
+  hl(0, "@function.call.bash",            { fg = "#ccb9ff" })
+  hl(0, "@function.method.bash",          { fg = "#be69ff" })
+  hl(0, "@function.method.call.bash",     { fg = "#ccb9ff" })
+  -- Variables (core to bash — $VAR, ${VAR}, $1, $@)
+  hl(0, "@variable.bash",                 { fg = "#8ccfe6" })
+  hl(0, "@variable.builtin.bash",         { fg = "#8ccfe6" })   -- $HOME, $PATH etc.
+  hl(0, "@variable.parameter.bash",       { fg = "#8ccfe6" })   -- function params
+  -- Keywords
+  hl(0, "@keyword.bash",                  { fg = "#ffaa22" })
+  hl(0, "@keyword.function.bash",         { fg = "#ffaa22", bold = true })   -- function
+  hl(0, "@keyword.operator.bash",         { fg = "#ffaa22", bold = true })   -- &&, ||, |
+  hl(0, "@keyword.return.bash",           { fg = "#ffaa22", bold = true })   -- return
+  hl(0, "@keyword.conditional.bash",      { fg = "#ffd900", bold = true })   -- if/then/elif/else/fi
+  hl(0, "@keyword.exception.bash",        { fg = "#ffd900", bold = true })   -- try/catch n/a, but reserved
+  hl(0, "@keyword.repeat.bash",           { fg = "#ffd900", bold = true })   -- for/while/until/do/done
+  hl(0, "@keyword.import.bash",           { fg = "#ffaa22", bold = true })   -- source, .
+  hl(0, "@keyword.directive.bash",        { fg = "#ffaa22", bold = true })   -- set -e etc.
+  -- Punctuation
+  hl(0, "@punctuation.special.bash",      { fg = "#ffaa22" })   -- $ { } in expansions
+  hl(0, "@punctuation.bracket.bash",      { fg = "#c8c8c8" })   -- ( ) [ ] { }
+  hl(0, "@punctuation.delimiter.bash",    { fg = "#ffaa22" })   -- ; & |
+  -- Operators
+  hl(0, "@operator.bash",                 { fg = "#ff33ee" })
+  -- Comments
+  hl(0, "@comment.bash",                  { fg = "#a7a7a7" })
+  hl(0, "@spell.bash",                    { fg = "#a7a7a7" })
+  -- Special and Builtin
+  hl(0, "@boolean.bash",                  { fg = "#8ccfe6" })   -- n/a for bash, but harmless
+  hl(0, "@constant.builtin.bash",         { fg = "#8ccfe6" })   -- true/false as commands? rare
+  hl(0, "@type.builtin.bash",             { fg = "#8ccfe6" })
+  hl(0, "@function.builtin.bash",         { fg = "#1ebea3" })   -- echo, cd, printf, test
+  -- Command names (the executable being called)
+  hl(0, "@function.bash",                 { fg = "#be69ff" })   -- command names
+  hl(0, "@command.bash",                  { fg = "#be69ff" })   -- fallback alias
+  -- Heredocs / Here-strings
+  hl(0, "@string.heredoc.bash",           { fg = "#95ee98", italic = true })
+  hl(0, "@string.heredoc.delimiter.bash", { fg = "#ffaa22" })
+  -- Fallback / Normal text
+  hl(0, "@text.bash",                     { fg = "#ffffff" })
 
   -- [[ mini.nvim ]]
   --  A collection of various small independent plugins/modules
   vim.pack.add { gh 'nvim-mini/mini.nvim' }
 
-  -- If a nerd font is available, load the icons module for pretty icons in various plugins.
+  -- If a nerd font is available, load the icons module for pretty icons in various plugins
   if vim.g.have_nerd_font then
     require('mini.icons').setup()
     -- Used for backwards compatibility with plugins that require `nvim-web-devicons` (e.g. telescope.nvim)
@@ -433,8 +672,6 @@ do
   require('mini.surround').setup()
 
   -- Simple and easy statusline.
-  --  You could remove this setup call if you don't like it,
-  --  and try some other statusline plugin
   local statusline = require 'mini.statusline'
   -- Set `use_icons` to true if you have a Nerd Font
   statusline.setup { use_icons = vim.g.have_nerd_font }
@@ -444,6 +681,18 @@ do
   -- cursor location to LINE:COLUMN
   ---@diagnostic disable-next-line: duplicate-set-field
   statusline.section_location = function() return '%2l:%-2v' end
+
+  -- Simpler version - just truncate the whole string
+  local max_git_width = 20
+  local original_git = statusline.section_git
+  ---@diagnostic disable-next-line: duplicate-set-field
+  statusline.section_git = function(args)
+    local git_info = original_git(args)
+    if #git_info > max_git_width then
+      return git_info:sub(1, max_git_width - 1) .. '…'
+    end
+    return git_info
+  end
 
   -- ... and there is more!
   --  Check out: https://github.com/nvim-mini/mini.nvim
@@ -531,29 +780,29 @@ do
       local buf = event.buf
 
       -- Find references for the word under your cursor.
-      vim.keymap.set('n', 'grr', builtin.lsp_references, { buffer = buf, desc = '[G]oto [R]eferences' })
+      vim.keymap.set('n', 'fr', builtin.lsp_references, { buffer = buf, desc = '[F]ind [R]eferences' })
 
       -- Jump to the implementation of the word under your cursor.
       -- Useful when your language has ways of declaring types without an actual implementation.
-      vim.keymap.set('n', 'gri', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
+      vim.keymap.set('n', 'fi', builtin.lsp_implementations, { buffer = buf, desc = '[F]ind [I]mplementation' })
 
       -- Jump to the definition of the word under your cursor.
       -- This is where a variable was first declared, or where a function is defined, etc.
       -- To jump back, press <C-t>.
-      vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
+      vim.keymap.set('n', 'fd', builtin.lsp_definitions, { buffer = buf, desc = '[F]ind [D]efinition' })
 
       -- Fuzzy find all the symbols in your current document.
       -- Symbols are things like variables, functions, types, etc.
-      vim.keymap.set('n', 'gO', builtin.lsp_document_symbols, { buffer = buf, desc = 'Open Document Symbols' })
+      vim.keymap.set('n', 'fo', builtin.lsp_document_symbols, { buffer = buf, desc = '[F]ind [O]pen Document Symbols' })
 
       -- Fuzzy find all the symbols in your current workspace.
       -- Similar to document symbols, except searches over your entire project.
-      vim.keymap.set('n', 'gW', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = 'Open Workspace Symbols' })
+      vim.keymap.set('n', 'fw', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = '[F]ind [W]orkspace Symbols' })
 
       -- Jump to the type of the word under your cursor.
       -- Useful when you're not sure what type a variable is and you want to see
       -- the definition of its *type*, not where it was *defined*.
-      vim.keymap.set('n', 'grt', builtin.lsp_type_definitions, { buffer = buf, desc = '[G]oto [T]ype Definition' })
+      vim.keymap.set('n', 'ft', builtin.lsp_type_definitions, { buffer = buf, desc = '[F]ind [T]ype Definition' })
     end,
   })
 
@@ -579,6 +828,13 @@ do
     end,
     { desc = '[S]earch [/] in Open Files' }
   )
+
+
+vim.keymap.set('n', '<leader>w', function()
+  vim.cmd('cd ' .. vim.fn.expand('%:p:h'))
+  print('Directory: ' .. vim.fn.getcwd())
+end, { desc = 'Set [W]orking Directory' })
+
 
   -- Shortcut for searching your Neovim configuration files
   vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim files' })
@@ -633,20 +889,20 @@ do
       -- for LSP related items. It sets the mode, buffer and description for us each time.
       local map = function(keys, func, desc, mode)
         mode = mode or 'n'
-        vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+        vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = '' .. desc })
       end
 
       -- Rename the variable under your cursor.
       --  Most Language Servers support renaming across files, etc.
-      map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
+      map('fn', vim.lsp.buf.rename, '[F]ind and Re[n]ame')
 
       -- Execute a code action, usually your cursor needs to be on top of an error
       -- or a suggestion from your LSP for this to activate.
-      map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+      map('fa', vim.lsp.buf.code_action, '[F]ind Code [A]ction', { 'n', 'x' })
 
       -- WARN: This is not Goto Definition, this is Goto Declaration.
       --  For example, in C this would take you to the header.
-      map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+      map('fD', vim.lsp.buf.declaration, '[F]ind [D]eclaration')
 
       -- The following two autocommands are used to highlight references of the
       -- word under your cursor when your cursor rests there for a little while.
@@ -692,7 +948,6 @@ do
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
   local servers = {
-    -- clangd = {},
     -- gopls = {},
     -- pyright = {},
     -- rust_analyzer = {},
@@ -702,6 +957,56 @@ do
     --
     -- But for many setups, the LSP (`ts_ls`) will work just fine
     -- ts_ls = {},
+
+    ty = {
+      settings = {
+        ty = {
+          configuration = {
+            rules = {
+              -- Put your rules here (this must be a map/object, not a list)
+              ["unresolved-reference"] = "warn",
+              ["possibly-unresolved-reference"] = "error",
+              -- add more rules as needed
+            },
+          },
+          -- configurationFile = "./ty.toml",   -- optional
+        },
+      },
+
+      -- Keep semantic tokens disabled to stop highlighting interference
+      on_attach = function(client)
+        client.server_capabilities.semanticTokensProvider = nil
+      end,
+    },
+
+    clangd = {
+      settings = {
+        clangd = { },
+      },
+      -- Keep semantic tokens disabled to stop highlighting interference
+      on_attach = function(client)
+        client.server_capabilities.semanticTokensProvider = nil
+      end,
+    },
+
+    bashls = {
+      settings = {
+        bashIde = {
+          -- ShellCheck is used for linting. Set to an empty string to disable it.
+          -- shellcheckPath = "shellcheck",
+
+          -- Glob pattern for finding shell scripts in your workspace.
+          -- globPattern = "*@(.sh|.inc|.bash|.command)",
+
+          -- Enable hover documentation for flags via explainshell.com.
+          -- explainshellEndpoint = "https://explainshell.com",
+        },
+      },
+      -- Keep semantic tokens disabled to stop highlighting interference
+      on_attach = function(client)
+        client.server_capabilities.semanticTokensProvider = nil
+      end,
+    },
 
     stylua = {}, -- Used to format Lua code
 
@@ -831,12 +1136,16 @@ do
   vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
   require('blink.cmp').setup {
     keymap = {
+      preset = 'default',
+      ['<CR>'] = { 'accept', 'fallback' },   -- Enter to confirm first selection
+      ['<Tab>'] = { 'accept', 'snippet_forward', 'fallback' },  -- Tab to confirm first selection
+      ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
       -- 'default' (recommended) for mappings similar to built-in completions
       --   <c-y> to accept ([y]es) the completion.
       --    This will auto-import if your LSP supports it.
       --    This will expand snippets if the LSP sent a snippet.
       -- 'super-tab' for tab to accept
-      -- 'enter' for enter to accept
+      -- 'enter'for enter to accept
       -- 'none' for no mappings
       --
       -- For an understanding of why the 'default' preset is recommended,
@@ -852,8 +1161,6 @@ do
       -- <c-k>: Toggle signature help
       --
       -- See `:help blink-cmp-config-keymap` for defining your own keymap
-      preset = 'default',
-
       -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
       --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
     },
@@ -970,13 +1277,52 @@ do
   -- require 'kickstart.plugins.indent_line'
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
-  -- require 'kickstart.plugins.neo-tree'
   -- require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
 
+  -- Install neo-tree
+  require 'kickstart.plugins.neo-tree'
+  -- Show and hide neo tree
+  vim.keymap.set("n", "<C-e>", ":Neotree toggle<CR>")
+  -- or to show current file's location:
+  vim.keymap.set("n", "<leader>e", ":Neotree reveal<CR>")
+  -- Change color
+  vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { fg = "#ffffff" })
+  vim.api.nvim_set_hl(0, "NeoTreeDirectoryIcon", { fg = "#a7a7a7" })
+
+  require("neo-tree").setup({
+    filesystem = {
+      window = {
+        mappings = {
+          ["."] = "noop",  -- Disables the default function of `.`
+        },
+      },
+    },
+    close_if_last_window = true,  -- Close neo-tree on quit
+  })
+
+  -- Auto resize split view
+  vim.opt.fillchars:append({ vert = "▕" })
+  vim.opt.equalalways = false
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "neo-tree",
+    callback = function()
+      vim.wo.winfixwidth = true
+    end,
+  })
+  vim.api.nvim_create_autocmd("VimResized", {
+    pattern = "*",
+    callback = function()
+      vim.defer_fn(function()
+        local cur_win = vim.api.nvim_get_current_win()
+        vim.cmd("wincmd =")
+        vim.api.nvim_set_current_win(cur_win)
+      end, 30)
+    end,
+  })
+
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   -- require 'custom.plugins'
+
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
