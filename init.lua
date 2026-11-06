@@ -238,14 +238,6 @@ do
   vim.keymap.set({ 'n', 'v' }, '<leader>e', vim.diagnostic.open_float, { desc = 'Diagnostic [E]rror' })
   vim.keymap.set({ 'n', 'v' }, '<leader>f', vim.diagnostic.setloclist, { desc = 'Diagnostic [F]ix list' })
 
-  -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
-  -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
-  -- is not what someone will guess without a bit more experience.
-  --
-  -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
-  -- or just use <C-\><C-n> to exit terminal mode
-  vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-
   -- TIP: Disable arrow keys in normal mode
   -- vim.keymap.set({ 'n', 'v' }, '<left>', '<cmd>echo "Use h to move!!"<CR>')
   -- vim.keymap.set({ 'n', 'v' }, '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -1362,35 +1354,27 @@ do
 end
 
 -- ============================================================
--- SECTION 10: OPTIONAL EXAMPLES / NEXT STEPS
--- kickstart.plugins.* examples
+-- SECTION 10: ADDITIONAL PLUGINS
+-- neo-tree, toggleterm...
 -- ============================================================
 do
-  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
-  -- init.lua. If you want these files, they are in the repository, so you can just download them and
-  -- place them in the correct locations.
-
-  -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
-  --
-  --  Here are some example plugins that I've included in the Kickstart repository.
-  --  Uncomment any of the lines below to enable them (you will need to restart nvim).
-  --
-  -- require 'kickstart.plugins.debug'
-  -- require 'kickstart.plugins.indent_line'
-  -- require 'kickstart.plugins.lint'
-  -- require 'kickstart.plugins.autopairs'
-  -- require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
-
   -- Install neo-tree
-  require 'kickstart.plugins.neo-tree'
+  vim.pack.add {
+    gh 'nvim-neo-tree/neo-tree.nvim',
+    gh 'nvim-lua/plenary.nvim',
+    gh 'MunifTanjim/nui.nvim',
+  }
+
   -- Show and hide neo-tree
-  vim.keymap.set('n', '<C-e>', ':Neotree toggle<CR>')
-  -- or to show current file's location:
-  -- vim.keymap.set("n", "<leader>n", ":Neotree reveal<CR>")
+  vim.keymap.set({ 'n', 'v', 'i' }, '<C-e>', ':Neotree toggle<CR>')
+  --  or show current file's location:
+  vim.keymap.set({ 'n', 'v' }, '\\', ':Neotree reveal<CR>')
+
   -- Change color
   vim.api.nvim_set_hl(0, 'NeoTreeDirectoryName', { fg = '#ffffff' })
   vim.api.nvim_set_hl(0, 'NeoTreeDirectoryIcon', { fg = '#a7a7a7' })
 
+  NEO_TREE_WIDTH = 35
   require('neo-tree').setup {
     filesystem = {
       window = {
@@ -1400,28 +1384,81 @@ do
       },
     },
     close_if_last_window = true, -- Close neo-tree on quit
+
+    window = {
+      position = 'left',
+      width = NEO_TREE_WIDTH,
+    },
+
+    event_handlers = {
+      {
+        event = 'neo_tree_window_after_open',
+        handler = function(args)
+          if args.position ~= 'left' and args.position ~= 'right' then return end
+
+          -- After Neo-tree opens, force any open horizontal ToggleTerm
+          -- back to the bottom so it reclaims the full width
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            local ft = vim.bo[buf].filetype
+            if ft == 'toggleterm' then
+              vim.api.nvim_win_call(win, function() vim.cmd 'wincmd J' end)
+              break
+            end
+          end
+        end,
+      },
+    },
+  }
+
+  -- Install toggleterm
+  vim.pack.add { gh 'akinsho/toggleterm.nvim' }
+
+  vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+
+  local TERM_HEIGHT = 15
+  require('toggleterm').setup {
+    open_mapping = [[<C-t>]],
+    insert_mappings = true,
+    terminal_mappings = false,
+    direction = 'horizontal',
+    size = TERM_HEIGHT,
+    persist_size = false,
   }
 
   -- Auto resize split view
+  vim.opt.splitkeep = 'topline' -- text stays put
   vim.opt.fillchars:append { vert = '▕' }
   vim.opt.equalalways = false
+
   vim.api.nvim_create_autocmd('FileType', {
     pattern = 'neo-tree',
     callback = function() vim.wo.winfixwidth = true end,
   })
-  vim.api.nvim_create_autocmd('VimResized', {
+
+  vim.api.nvim_create_autocmd({ 'VimResized', 'WinEnter', 'WinClosed', 'WinNew' }, {
     pattern = '*',
     callback = function()
+      -- 1. Keep ToggleTerm at fixed height
+      local ok, toggleterm = pcall(require, 'toggleterm.terminal')
+      if ok then
+        for _, term in pairs(toggleterm.get_all()) do
+          if term:is_open() and term.direction == 'horizontal' then vim.api.nvim_win_set_height(term.window, TERM_HEIGHT) end
+        end
+      end
+      -- 2. Keep Neo-tree at fixed width
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.bo[buf].filetype == 'neo-tree' then vim.api.nvim_win_set_width(win, NEO_TREE_WIDTH) end
+      end
+      -- 3. Equalize the other splits
       vim.defer_fn(function()
         local cur_win = vim.api.nvim_get_current_win()
         vim.cmd 'wincmd ='
-        vim.api.nvim_set_current_win(cur_win)
-      end, 30)
+        if vim.api.nvim_win_is_valid(cur_win) then vim.api.nvim_set_current_win(cur_win) end
+      end, 20)
     end,
   })
-
-  -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  -- require 'custom.plugins'
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
