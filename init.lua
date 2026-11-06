@@ -182,7 +182,7 @@ do
 
   -- Configure tab for specific file types
   vim.api.nvim_create_autocmd("FileType", {
-    pattern = { "sh", "bash", "py"},
+    pattern = { "sh", "bash", "py", "c", "cpp"},
     callback = function()
       vim.opt_local.expandtab = true
       vim.opt_local.shiftwidth = 4
@@ -202,12 +202,15 @@ do
   --  See `:help vim.keymap.set()`
 
   -- New line with Enter in normal mode
-  vim.keymap.set('n', '<CR>', 'o<Esc>k')
-  vim.keymap.set('n', '<S-CR>', 'O<Esc>j')
+  vim.keymap.set({ 'n', 'v' }, '<CR>', 'o<Esc>k')
+  vim.keymap.set({ 'n', 'v' }, '<S-CR>', 'O<Esc>j')
+  -- Indent current line
+  vim.keymap.set('n', ',', '<<', { noremap = true, silent = true })
+  vim.keymap.set('n', '.', '>>', { noremap = true, silent = true })
 
   -- Clear highlights on search when pressing <Esc> in normal mode
   --  See `:help hlsearch`
-  vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+  vim.keymap.set({ 'n', 'v' }, '<Esc>', '<cmd>nohlsearch<CR>')
 
   -- Diagnostic Config & Keymaps
   --  See `:help vim.diagnostic.Opts`
@@ -233,7 +236,8 @@ do
     },
   }
 
-  vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>e', vim.diagnostic.open_float, { desc = 'Diagnostic [E]rror' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>f', vim.diagnostic.setloclist, { desc = 'Diagnostic [F]ix list' })
 
   -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
   -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -244,19 +248,27 @@ do
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
   -- TIP: Disable arrow keys in normal mode
-  -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
-  -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
-  -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
-  -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+  -- vim.keymap.set({ 'n', 'v' }, '<left>', '<cmd>echo "Use h to move!!"<CR>')
+  -- vim.keymap.set({ 'n', 'v' }, '<right>', '<cmd>echo "Use l to move!!"<CR>')
+  -- vim.keymap.set({ 'n', 'v' }, '<up>', '<cmd>echo "Use k to move!!"<CR>')
+  -- vim.keymap.set({ 'n', 'v' }, '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
   -- Keybinds to make split navigation easier.
   --  Use CTRL+<hjkl> to switch between windows
   --
   --  See `:help wincmd` for a list of all window commands
-  vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-  vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-  vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-  vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+  vim.keymap.set({ 'n', 'v' }, '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+  vim.keymap.set({ 'n', 'v' }, '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+  vim.keymap.set({ 'n', 'v' }, '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+  vim.keymap.set({ 'n', 'v' }, '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+  --  Go to next window
+  vim.keymap.set({ 'n', 'v' }, '<Tab>', '<C-w>w', { noremap = true, silent = true })
+  --  Go to previous window
+  vim.keymap.set({ 'n', 'v' }, '<S-Tab>', '<C-w>W', { noremap = true, silent = true })
+  -- Close window in focus
+  vim.keymap.set({ 'n', 'v' }, 'q', ':close<CR>', { noremap = true, silent = true })
+  -- Save window in focus
+  vim.keymap.set({ 'n', 'v' }, 's', ':w<CR>', { noremap = true, silent = true })
 
   -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
   -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -400,12 +412,18 @@ do
     icons = { mappings = vim.g.have_nerd_font },
     -- Document existing key chains
     spec = {
+      { '<leader>d', group = '[D]iff', mode = { 'n', 'v' } },
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
-      { '<leader>t', group = '[T]oggle' },
+      { '<leader>t', group = '[T]oggle', mode = { 'n', 'v' } },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
-      { 'f', group = 'LSP Actions', mode = { 'n' } },
+      { 'f', group = 'LSP Actions', mode = { 'n', 'v' } },
     },
   }
+
+  vim.keymap.set({'n', 'v'}, '?', function()
+    require("which-key").show({ global = true })
+  end, { desc = "Show which-key" })
+
   -- Set highlights separately
   vim.api.nvim_set_hl(0, 'WhichKey', { fg = '#ff6b6b' })
   vim.api.nvim_set_hl(0, 'WhichKeyDesc', { fg = '#a7a7a7' })
@@ -432,12 +450,17 @@ do
     },
   }
   -- Keymaps
-  vim.keymap.set('n', 'gd', '<cmd>DiffviewOpen -- %<cr>',
-    { desc = 'Diff current file vs previous commit' })
-  vim.keymap.set('n', 'gD', '<cmd>DiffviewOpen <cr>',
-    { desc = 'Diff all files vs previous commit' })
-  vim.keymap.set('n', 'ga', '<cmd>DiffviewOpen origin/devel<cr>',
-    { desc = 'Diff all files vs devel' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>dc', '<cmd>DiffviewOpen -- %<cr>',
+    { desc = '[C]urrent file vs previous commit' })
+
+  vim.keymap.set({ 'n', 'v' }, '<leader>dC', '<cmd>DiffviewOpen origin/devel -- %<cr>',
+    { desc = '[C]urrent file vs devel' })
+
+  vim.keymap.set({ 'n', 'v' }, '<leader>da', '<cmd>DiffviewOpen <cr>',
+    { desc = '[A]ll files vs previous commit' })
+
+  vim.keymap.set({ 'n', 'v' }, '<leader>dA', '<cmd>DiffviewOpen origin/devel<cr>',
+    { desc = '[A]ll files vs devel' })
 
   -- [[ Colorscheme ]]
   -- You can easily change to a different colorscheme
@@ -760,17 +783,17 @@ do
 
   -- See `:help telescope.builtin`
   local builtin = require 'telescope.builtin'
-  vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-  vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-  vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-  vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
   vim.keymap.set({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-  vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-  vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-  vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-  vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-  vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
-  vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
+  vim.keymap.set({ 'n', 'v' }, '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
   -- Add Telescope-based LSP pickers when an LSP attaches to a buffer.
   -- If you later switch picker plugins, this is where to update these mappings.
@@ -780,34 +803,34 @@ do
       local buf = event.buf
 
       -- Find references for the word under your cursor.
-      vim.keymap.set('n', 'fr', builtin.lsp_references, { buffer = buf, desc = '[F]ind [R]eferences' })
+      vim.keymap.set({ 'n', 'v' }, 'fr', builtin.lsp_references, { buffer = buf, desc = '[F]ind [R]eferences' })
 
       -- Jump to the implementation of the word under your cursor.
       -- Useful when your language has ways of declaring types without an actual implementation.
-      vim.keymap.set('n', 'fi', builtin.lsp_implementations, { buffer = buf, desc = '[F]ind [I]mplementation' })
+      vim.keymap.set({ 'n', 'v' }, 'fi', builtin.lsp_implementations, { buffer = buf, desc = '[F]ind [I]mplementation' })
 
       -- Jump to the definition of the word under your cursor.
       -- This is where a variable was first declared, or where a function is defined, etc.
       -- To jump back, press <C-t>.
-      vim.keymap.set('n', 'fd', builtin.lsp_definitions, { buffer = buf, desc = '[F]ind [D]efinition' })
+      vim.keymap.set({ 'n', 'v' }, 'fd', builtin.lsp_definitions, { buffer = buf, desc = '[F]ind [D]efinition' })
 
       -- Fuzzy find all the symbols in your current document.
       -- Symbols are things like variables, functions, types, etc.
-      vim.keymap.set('n', 'fo', builtin.lsp_document_symbols, { buffer = buf, desc = '[F]ind [O]pen Document Symbols' })
+      vim.keymap.set({ 'n', 'v' }, 'fo', builtin.lsp_document_symbols, { buffer = buf, desc = '[F]ind [O]pen document symbols' })
 
       -- Fuzzy find all the symbols in your current workspace.
       -- Similar to document symbols, except searches over your entire project.
-      vim.keymap.set('n', 'fw', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = '[F]ind [W]orkspace Symbols' })
+      vim.keymap.set({ 'n', 'v' }, 'fw', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = '[F]ind [W]orkspace symbols' })
 
       -- Jump to the type of the word under your cursor.
       -- Useful when you're not sure what type a variable is and you want to see
       -- the definition of its *type*, not where it was *defined*.
-      vim.keymap.set('n', 'ft', builtin.lsp_type_definitions, { buffer = buf, desc = '[F]ind [T]ype Definition' })
+      vim.keymap.set({ 'n', 'v' }, 'ft', builtin.lsp_type_definitions, { buffer = buf, desc = '[F]ind [T]ype definition' })
     end,
   })
 
   -- Override default behavior and theme when searching
-  vim.keymap.set('n', '<leader>/', function()
+  vim.keymap.set({ 'n', 'v' }, '<leader>/', function()
     -- You can pass additional configuration to Telescope to change the theme, layout, etc.
     builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
       winblend = 10,
@@ -826,18 +849,18 @@ do
         prompt_title = 'Live Grep in Open Files',
       }
     end,
-    { desc = '[S]earch [/] in Open Files' }
+    { desc = '[S]earch [/] in open files' }
   )
 
 
-vim.keymap.set('n', '<leader>w', function()
+vim.keymap.set({ 'n', 'v' }, '<leader>w', function()
   vim.cmd('cd ' .. vim.fn.expand('%:p:h'))
   print('Directory: ' .. vim.fn.getcwd())
-end, { desc = 'Set [W]orking Directory' })
+end, { desc = 'Set [W]orking directory' })
 
 
   -- Shortcut for searching your Neovim configuration files
-  vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim files' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim files' })
 end
 
 -- ============================================================
@@ -894,11 +917,11 @@ do
 
       -- Rename the variable under your cursor.
       --  Most Language Servers support renaming across files, etc.
-      map('fn', vim.lsp.buf.rename, '[F]ind and Re[n]ame')
+      map('fn', vim.lsp.buf.rename, '[F]ind and re[N]ame')
 
       -- Execute a code action, usually your cursor needs to be on top of an error
       -- or a suggestion from your LSP for this to activate.
-      map('fa', vim.lsp.buf.code_action, '[F]ind Code [A]ction', { 'n', 'x' })
+      map('fa', vim.lsp.buf.code_action, '[F]ind code [A]ction', { 'n', 'x' })
 
       -- WARN: This is not Goto Definition, this is Goto Declaration.
       --  For example, in C this would take you to the header.
@@ -938,7 +961,7 @@ do
       --
       -- This may be unwanted, since they displace some of your code
       if client and client:supports_method('textDocument/inlayHint', event.buf) then
-        map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
+        map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle inlay [H]ints')
       end
     end,
   })
@@ -1073,6 +1096,7 @@ do
     vim.lsp.config(name, server)
     vim.lsp.enable(name)
   end
+
 end
 
 -- ============================================================
@@ -1103,14 +1127,14 @@ do
     formatters_by_ft = {
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
-      -- python = { "isort", "black" },
+      python = { "ruff" },
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
     },
   }
 
-  vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>a', function() require('conform').format { async = true } end, { desc = '[A]uto formatting' })
 end
 
 -- ============================================================
@@ -1281,10 +1305,10 @@ do
 
   -- Install neo-tree
   require 'kickstart.plugins.neo-tree'
-  -- Show and hide neo tree
+  -- Show and hide neo-tree
   vim.keymap.set("n", "<C-e>", ":Neotree toggle<CR>")
   -- or to show current file's location:
-  vim.keymap.set("n", "<leader>e", ":Neotree reveal<CR>")
+  -- vim.keymap.set("n", "<leader>n", ":Neotree reveal<CR>")
   -- Change color
   vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { fg = "#ffffff" })
   vim.api.nvim_set_hl(0, "NeoTreeDirectoryIcon", { fg = "#a7a7a7" })
