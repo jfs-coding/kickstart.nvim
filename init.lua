@@ -92,7 +92,7 @@ do
   vim.opt.termguicolors = true
 
   -- No start screen
-  vim.opt.shortmess:append("I")
+  vim.opt.shortmess:append 'I'
 
   -- Enable faster startup by caching compiled Lua modules
   vim.loader.enable()
@@ -103,8 +103,8 @@ do
   vim.g.mapleader = ' '
   vim.g.maplocalleader = ' '
 
-  vim.keymap.set({'n', 'v'}, '.', ':')
-  vim.keymap.set({'n', 'v'}, ',', ';')
+  vim.keymap.set({ 'n', 'v' }, '.', ':')
+  vim.keymap.set({ 'n', 'v' }, ',', ';')
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
   vim.g.have_nerd_font = true
@@ -181,8 +181,8 @@ do
   vim.o.confirm = true
 
   -- Configure tab for specific file types
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = { "sh", "bash", "py", "c", "cpp"},
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'sh', 'bash', 'py', 'c', 'cpp' },
     callback = function()
       vim.opt_local.expandtab = true
       vim.opt_local.shiftwidth = 4
@@ -190,7 +190,6 @@ do
       vim.opt_local.softtabstop = 4
     end,
   })
-
 end
 
 -- ============================================================
@@ -266,7 +265,7 @@ do
   --  Go to previous window
   vim.keymap.set({ 'n', 'v' }, '<S-Tab>', '<C-w>W', { noremap = true, silent = true })
   -- Close window in focus
-  vim.keymap.set({ 'n', 'v' }, 'q', ':close<CR>', { noremap = true, silent = true })
+  vim.keymap.set({ 'n', 'v' }, 'q', ':q<CR>', { noremap = true, silent = true })
   -- Save window in focus
   vim.keymap.set({ 'n', 'v' }, 's', ':w<CR>', { noremap = true, silent = true })
 
@@ -403,9 +402,9 @@ do
     -- Trigger which-key on these keymaps
     triggers = {
       -- keep the defaults (adjust modes if you use the broader default)
-      { "<auto>", mode = "nxso" },
+      { '<auto>', mode = 'nxso' },
       -- add f (builtin find)
-      { "f", mode = { "n" } },
+      { 'f', mode = { 'n' } },
     },
     -- Delay between pressing a key and opening which-key (milliseconds)
     delay = 0,
@@ -414,15 +413,11 @@ do
     spec = {
       { '<leader>d', group = '[D]iff', mode = { 'n', 'v' } },
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
-      { '<leader>t', group = '[T]oggle', mode = { 'n', 'v' } },
-      { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
       { 'f', group = 'LSP Actions', mode = { 'n', 'v' } },
     },
   }
 
-  vim.keymap.set({'n', 'v'}, '?', function()
-    require("which-key").show({ global = true })
-  end, { desc = "Show which-key" })
+  vim.keymap.set({ 'n', 'v' }, '?', function() require('which-key').show { global = true } end, { desc = 'Show which-key' })
 
   -- Set highlights separately
   vim.api.nvim_set_hl(0, 'WhichKey', { fg = '#ff6b6b' })
@@ -450,17 +445,13 @@ do
     },
   }
   -- Keymaps
-  vim.keymap.set({ 'n', 'v' }, '<leader>dc', '<cmd>DiffviewOpen -- %<cr>',
-    { desc = '[C]urrent file vs previous commit' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>dc', '<cmd>DiffviewOpen -- %<cr>', { desc = '[C]urrent file vs previous commit' })
 
-  vim.keymap.set({ 'n', 'v' }, '<leader>dC', '<cmd>DiffviewOpen origin/devel -- %<cr>',
-    { desc = '[C]urrent file vs devel' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>dC', '<cmd>DiffviewOpen origin/devel -- %<cr>', { desc = '[C]urrent file vs devel' })
 
-  vim.keymap.set({ 'n', 'v' }, '<leader>da', '<cmd>DiffviewOpen <cr>',
-    { desc = '[A]ll files vs previous commit' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>da', '<cmd>DiffviewOpen <cr>', { desc = '[A]ll files vs previous commit' })
 
-  vim.keymap.set({ 'n', 'v' }, '<leader>dA', '<cmd>DiffviewOpen origin/devel<cr>',
-    { desc = '[A]ll files vs devel' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>dA', '<cmd>DiffviewOpen origin/devel<cr>', { desc = '[A]ll files vs devel' })
 
   -- [[ Colorscheme ]]
   -- You can easily change to a different colorscheme
@@ -476,190 +467,241 @@ do
   hl(0, 'CursorLineNr', { fg = '#FFD300', bg = '#2C323C', bold = true })
 
   -- Background
-  hl(0, "Normal", { bg = "#181819" })
+  hl(0, 'Normal', { bg = '#181819' })
 
   -- Custom: Python Tree-sitter highlighting overrides
   -- Strings & related
-  hl(0, "@string.python",                 { fg = "#95ee98", italic = true })
-  hl(0, "@string.delimiter.python",       { fg = "#95ee98", italic = true })
-  hl(0, "@string.special.python",         { fg = "#95ee98", italic = true })
-  hl(0, "@string.escape.python",          { fg = "#ffaa22" })
+  hl(0, '@string.python', { fg = '#95ee98', italic = true })
+  hl(0, '@string.delimiter.python', { fg = '#95ee98', italic = true })
+  hl(0, '@string.special.python', { fg = '#95ee98', italic = true })
+  hl(0, '@string.escape.python', { fg = '#ffaa22' })
   -- Numbers
-  hl(0, "@number.python",                 { fg = "#1fc522" })
-  hl(0, "@number.float.python",           { fg = "#1fc522" })
+  hl(0, '@number.python', { fg = '#1fc522' })
+  hl(0, '@number.float.python', { fg = '#1fc522' })
   -- Functions & Calls
-  hl(0, "@function.python",               { fg = "#be69ff" })
-  hl(0, "@function.call.python",          { fg = "#ccb9ff" })
-  hl(0, "@function.method.python",        { fg = "#be69ff" })
-  hl(0, "@function.method.call.python",   { fg = "#ccb9ff" })
+  hl(0, '@function.python', { fg = '#be69ff' })
+  hl(0, '@function.call.python', { fg = '#ccb9ff' })
+  hl(0, '@function.method.python', { fg = '#be69ff' })
+  hl(0, '@function.method.call.python', { fg = '#ccb9ff' })
   -- Classes & Types
-  hl(0, "@type.python",                   { fg = "#7e91e4" })
+  hl(0, '@type.python', { fg = '#7e91e4' })
   -- Keywords
-  hl(0, "@keyword.python",                { fg = "#ffaa22" })
-  hl(0, "@keyword.function.python",       { fg = "#ffaa22", bold = true })
-  hl(0, "@keyword.operator.python",       { fg = "#ffaa22", bold = true })
-  hl(0, "@keyword.return.python",         { fg = "#ffaa22", bold = true })
-  hl(0, "@keyword.type.python",           { fg = "#ffaa22", bold = true })
-  hl(0, "@keyword.import.python",         { fg = "#ffaa22", bold = true })
-  hl(0, "@keyword.conditional.python",    { fg = "#ffd900", bold = true })
-  hl(0, "@keyword.exception.python",      { fg = "#ffd900", bold = true })
-  hl(0, "@keyword.repeat.python",         { fg = "#ffd900", bold = true })
+  hl(0, '@keyword.python', { fg = '#ffaa22' })
+  hl(0, '@keyword.function.python', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.operator.python', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.return.python', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.type.python', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.import.python', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.conditional.python', { fg = '#ffd900', bold = true })
+  hl(0, '@keyword.exception.python', { fg = '#ffd900', bold = true })
+  hl(0, '@keyword.repeat.python', { fg = '#ffd900', bold = true })
   -- Punctuation
-  hl(0, "@punctuation.special.python",      { fg = "#ffaa22" })
+  hl(0, '@punctuation.special.python', { fg = '#ffaa22' })
   -- Operators
-  hl(0, "@operator.python",               { fg = "#ff33ee" })
+  hl(0, '@operator.python', { fg = '#ff33ee' })
   -- Decorators
-  hl(0, "@attribute.python",              { fg = "#ffec7d" })
-  hl(0, "@decorator.python",              { fg = "#ffec7d" })
-  hl(0, "@attribute.builtin.python",      { fg = "#ffec7d" })
+  hl(0, '@attribute.python', { fg = '#ffec7d' })
+  hl(0, '@decorator.python', { fg = '#ffec7d' })
+  hl(0, '@attribute.builtin.python', { fg = '#ffec7d' })
   -- Comments
-  hl(0, "@comment.python",                { fg = "#a7a7a7" })
-  hl(0, "@spell.python",                  { fg = "#a7a7a7" })
-  hl(0, "@string.documentation.python",   { fg = "#a7a7a7" })
+  hl(0, '@comment.python', { fg = '#a7a7a7' })
+  hl(0, '@spell.python', { fg = '#a7a7a7' })
+  hl(0, '@string.documentation.python', { fg = '#a7a7a7' })
   -- Special and Builtin
-  hl(0, "@variable.builtin.python",       { fg = "#8ccfe6" })
-  hl(0, "@boolean.python",                { fg = "#8ccfe6" })
-  hl(0, "@constant.builtin.python",       { fg = "#8ccfe6" })
-  hl(0, "@type.builtin.python",           { fg = "#8ccfe6" })
-  hl(0, "@function.builtin.python",       { fg = "#1ebea3" })
+  hl(0, '@variable.builtin.python', { fg = '#8ccfe6' })
+  hl(0, '@boolean.python', { fg = '#8ccfe6' })
+  hl(0, '@constant.builtin.python', { fg = '#8ccfe6' })
+  hl(0, '@type.builtin.python', { fg = '#8ccfe6' })
+  hl(0, '@function.builtin.python', { fg = '#1ebea3' })
   -- Exceptions
-  hl(0, "@exception.python",              { fg = "#da4453" })
+  hl(0, '@exception.python', { fg = '#da4453' })
   -- Overloaders / Special
-  hl(0, '@function.magic.python',         { fg = "#f535b8" })
-  hl(0, '@constructor.python',            { fg = "#dc277f" })
+  hl(0, '@function.magic.python', { fg = '#f535b8' })
+  hl(0, '@constructor.python', { fg = '#dc277f' })
   -- Fallback / Normal text (rarely needed)
-  hl(0, "@text.python",                   { fg = "#ffffff" })
+  hl(0, '@text.python', { fg = '#ffffff' })
 
   -- Custom: C Tree-sitter highlighting overrides
   -- Strings & related
-  hl(0, "@string.c",                    { fg = "#95ee98", italic = true })
-  hl(0, "@string.delimiter.c",          { fg = "#95ee98", italic = true })
-  hl(0, "@string.special.c",            { fg = "#95ee98", italic = true })
-  hl(0, "@string.escape.c",             { fg = "#ffaa22" })
+  hl(0, '@string.c', { fg = '#95ee98', italic = true })
+  hl(0, '@string.delimiter.c', { fg = '#95ee98', italic = true })
+  hl(0, '@string.special.c', { fg = '#95ee98', italic = true })
+  hl(0, '@string.escape.c', { fg = '#ffaa22' })
   -- Numbers
-  hl(0, "@number.c",                    { fg = "#1fc522" })
-  hl(0, "@number.float.c",              { fg = "#1fc522" })
+  hl(0, '@number.c', { fg = '#1fc522' })
+  hl(0, '@number.float.c', { fg = '#1fc522' })
   -- Functions & Calls
-  hl(0, "@function.c",                  { fg = "#be69ff" })
-  hl(0, "@function.call.c",             { fg = "#ccb9ff" })
-  hl(0, "@function.method.c",           { fg = "#be69ff" })
-  hl(0, "@function.method.call.c",      { fg = "#ccb9ff" })
+  hl(0, '@function.c', { fg = '#be69ff' })
+  hl(0, '@function.call.c', { fg = '#ccb9ff' })
+  hl(0, '@function.method.c', { fg = '#be69ff' })
+  hl(0, '@function.method.call.c', { fg = '#ccb9ff' })
   -- Classes & Types
-  hl(0, "@type.c",                      { fg = "#7e91e4" })
+  hl(0, '@type.c', { fg = '#7e91e4' })
   -- Keywords
-  hl(0, "@keyword.c",                   { fg = "#ffaa22" })
-  hl(0, "@keyword.function.c",          { fg = "#ffaa22", bold = true })
-  hl(0, "@keyword.operator.c",          { fg = "#ffaa22", bold = true })
-  hl(0, "@keyword.return.c",            { fg = "#ffaa22", bold = true })
-  hl(0, "@keyword.type.c",              { fg = "#ffaa22", bold = true })
-  hl(0, "@keyword.import.c",            { fg = "#ffaa22", bold = true })   -- #include
-  hl(0, "@keyword.conditional.c",       { fg = "#ffd900", bold = true })
-  hl(0, "@keyword.exception.c",         { fg = "#ffd900", bold = true })   -- try/catch/throw
-  hl(0, "@keyword.repeat.c",            { fg = "#ffd900", bold = true })   -- for/while/do
-  hl(0, "@keyword.coroutine.c",         { fg = "#ffd900", bold = true })   -- co_await/co_return
-  hl(0, "@keyword.directive.c",         { fg = "#ffaa22", bold = true })   -- preprocessor
-  hl(0, "@keyword.directive.define.c",  { fg = "#ffaa22", bold = true })   -- #define
+  hl(0, '@keyword.c', { fg = '#ffaa22' })
+  hl(0, '@keyword.function.c', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.operator.c', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.return.c', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.type.c', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.import.c', { fg = '#ffaa22', bold = true }) -- #include
+  hl(0, '@keyword.conditional.c', { fg = '#ffd900', bold = true })
+  hl(0, '@keyword.exception.c', { fg = '#ffd900', bold = true }) -- try/catch/throw
+  hl(0, '@keyword.repeat.c', { fg = '#ffd900', bold = true }) -- for/while/do
+  hl(0, '@keyword.coroutine.c', { fg = '#ffd900', bold = true }) -- co_await/co_return
+  hl(0, '@keyword.directive.c', { fg = '#ffaa22', bold = true }) -- preprocessor
+  hl(0, '@keyword.directive.define.c', { fg = '#ffaa22', bold = true }) -- #define
   -- Punctuation
-  hl(0, "@punctuation.special.c",       { fg = "#ffaa22" })
-  hl(0, "@punctuation.delimiter.c",     { fg = "#c8c8c8" })
+  hl(0, '@punctuation.special.c', { fg = '#ffaa22' })
+  hl(0, '@punctuation.delimiter.c', { fg = '#c8c8c8' })
   -- Operators
-  hl(0, "@operator.c",                  { fg = "#ff33ee" })
+  hl(0, '@operator.c', { fg = '#ff33ee' })
   -- Attributes / Annotations ([[nodiscard]], alignas, etc.)
-  hl(0, "@attribute.c",                 { fg = "#ffec7d" })
-  hl(0, "@attribute.builtin.c",         { fg = "#ffec7d" })
+  hl(0, '@attribute.c', { fg = '#ffec7d' })
+  hl(0, '@attribute.builtin.c', { fg = '#ffec7d' })
   -- Comments & Doxygen
-  hl(0, "@comment.c",                   { fg = "#a7a7a7" })
-  hl(0, "@spell.c",                     { fg = "#a7a7a7" })
-  hl(0, "@comment.documentation.c",     { fg = "#a7a7a7" })
+  hl(0, '@comment.c', { fg = '#a7a7a7' })
+  hl(0, '@spell.c', { fg = '#a7a7a7' })
+  hl(0, '@comment.documentation.c', { fg = '#a7a7a7' })
   -- Special and Builtin
-  hl(0, "@variable.builtin.c",          { fg = "#8ccfe6" })   -- this
-  hl(0, "@boolean.c",                   { fg = "#8ccfe6" })
-  hl(0, "@constant.builtin.c",          { fg = "#8ccfe6" })   -- nullptr, true, false
-  hl(0, "@type.builtin.c",              { fg = "#8ccfe6" })   -- int, char, size_t...
-  hl(0, "@function.builtin.c",          { fg = "#1ebea3" })
+  hl(0, '@variable.builtin.c', { fg = '#8ccfe6' }) -- this
+  hl(0, '@boolean.c', { fg = '#8ccfe6' })
+  hl(0, '@constant.builtin.c', { fg = '#8ccfe6' }) -- nullptr, true, false
+  hl(0, '@type.builtin.c', { fg = '#8ccfe6' }) -- int, char, size_t...
+  hl(0, '@function.builtin.c', { fg = '#1ebea3' })
   -- Exceptions (catch params, etc.)
-  hl(0, "@exception.c",                 { fg = "#da4453" })
+  hl(0, '@exception.c', { fg = '#da4453' })
   -- Overloaders / Special
-  hl(0, '@function.magic.cpp',            { fg = "#f535b8" })   -- operator overloads
-  hl(0, '@constructor.cpp',               { fg = "#dc277f" })
+  hl(0, '@function.magic.cpp', { fg = '#f535b8' }) -- operator overloads
+  hl(0, '@constructor.cpp', { fg = '#dc277f' })
   -- Namespaces
-  hl(0, "@module.c",                    { fg = "#7e91e4" })
+  hl(0, '@module.c', { fg = '#7e91e4' })
   -- Fallback / Normal text
-  hl(0, "@text.c",                      { fg = "#ffffff" })
+  hl(0, '@text.c', { fg = '#ffffff' })
 
   -- Custom: JSON Tree-sitter highlighting overrides
   -- Strings (object keys AND string values both map here)
-  hl(0, "@string.json",                    { fg = "#95ee98", italic = true })
-  hl(0, "@string.delimiter.json",          { fg = "#95ee98", italic = true })
-  hl(0, "@string.special.json",            { fg = "#95ee98", italic = true })
-  hl(0, "@string.escape.json",             { fg = "#ffaa22" })   -- \" \\ \n \uXXXX
+  hl(0, '@string.json', { fg = '#95ee98', italic = true })
+  hl(0, '@string.delimiter.json', { fg = '#95ee98', italic = true })
+  hl(0, '@string.special.json', { fg = '#95ee98', italic = true })
+  hl(0, '@string.escape.json', { fg = '#ffaa22' }) -- \" \\ \n \uXXXX
   -- Object keys get their own capture in nvim-treesitter's JSON parser
-  hl(0, "@field.json",                     { fg = "#7e91e4" })   -- key names
-  hl(0, "@property.json",                  { fg = "#7e91e4" })   -- fallback alias
+  hl(0, '@field.json', { fg = '#7e91e4' }) -- key names
+  hl(0, '@property.json', { fg = '#7e91e4' }) -- fallback alias
   -- Numbers (int and float share @number in JSON)
-  hl(0, "@number.json",                    { fg = "#1fc522" })
-  hl(0, "@number.float.json",              { fg = "#1fc522" })
+  hl(0, '@number.json', { fg = '#1fc522' })
+  hl(0, '@number.float.json', { fg = '#1fc522' })
   -- Booleans and null
-  hl(0, "@boolean.json",                   { fg = "#8ccfe6" })   -- true / false
-  hl(0, "@constant.builtin.json",          { fg = "#8ccfe6" })   -- null
+  hl(0, '@boolean.json', { fg = '#8ccfe6' }) -- true / false
+  hl(0, '@constant.builtin.json', { fg = '#8ccfe6' }) -- null
   -- Punctuation: { } [ ] , :
-  hl(0, "@punctuation.bracket.json",       { fg = "#c8c8c8" })
-  hl(0, "@punctuation.delimiter.json",     { fg = "#ffaa22" })   -- , and :
-  hl(0, "@punctuation.special.json",       { fg = "#ffaa22" })
+  hl(0, '@punctuation.bracket.json', { fg = '#c8c8c8' })
+  hl(0, '@punctuation.delimiter.json', { fg = '#ffaa22' }) -- , and :
+  hl(0, '@punctuation.special.json', { fg = '#ffaa22' })
   -- Comments — NOT valid JSON, but many tools (JSONC, json5) allow them
-  hl(0, "@comment.json",                   { fg = "#a7a7a7" })
+  hl(0, '@comment.json', { fg = '#a7a7a7' })
   -- Fallback / Normal text
-  hl(0, "@text.json",                      { fg = "#ffffff" })
+  hl(0, '@text.json', { fg = '#ffffff' })
 
   -- Custom: bash Tree-sitter highlighting overrides
   -- Strings & related
-  hl(0, "@string.bash",                   { fg = "#95ee98", italic = true })
-  hl(0, "@string.delimiter.bash",         { fg = "#95ee98", italic = true })
-  hl(0, "@string.special.bash",           { fg = "#95ee98", italic = true })
-  hl(0, "@string.escape.bash",            { fg = "#ffaa22" })   -- \n \\ \$
+  hl(0, '@string.bash', { fg = '#95ee98', italic = true })
+  hl(0, '@string.delimiter.bash', { fg = '#95ee98', italic = true })
+  hl(0, '@string.special.bash', { fg = '#95ee98', italic = true })
+  hl(0, '@string.escape.bash', { fg = '#ffaa22' }) -- \n \\ \$
   -- Numbers
-  hl(0, "@number.bash",                   { fg = "#1fc522" })
+  hl(0, '@number.bash', { fg = '#1fc522' })
   -- Functions & Calls
-  hl(0, "@function.bash",                 { fg = "#be69ff" })
-  hl(0, "@function.call.bash",            { fg = "#ccb9ff" })
-  hl(0, "@function.method.bash",          { fg = "#be69ff" })
-  hl(0, "@function.method.call.bash",     { fg = "#ccb9ff" })
+  hl(0, '@function.bash', { fg = '#be69ff' })
+  hl(0, '@function.call.bash', { fg = '#ccb9ff' })
+  hl(0, '@function.method.bash', { fg = '#be69ff' })
+  hl(0, '@function.method.call.bash', { fg = '#ccb9ff' })
   -- Variables (core to bash — $VAR, ${VAR}, $1, $@)
-  hl(0, "@variable.bash",                 { fg = "#8ccfe6" })
-  hl(0, "@variable.builtin.bash",         { fg = "#8ccfe6" })   -- $HOME, $PATH etc.
-  hl(0, "@variable.parameter.bash",       { fg = "#8ccfe6" })   -- function params
+  hl(0, '@variable.bash', { fg = '#8ccfe6' })
+  hl(0, '@variable.builtin.bash', { fg = '#8ccfe6' }) -- $HOME, $PATH etc.
+  hl(0, '@variable.parameter.bash', { fg = '#8ccfe6' }) -- function params
   -- Keywords
-  hl(0, "@keyword.bash",                  { fg = "#ffaa22" })
-  hl(0, "@keyword.function.bash",         { fg = "#ffaa22", bold = true })   -- function
-  hl(0, "@keyword.operator.bash",         { fg = "#ffaa22", bold = true })   -- &&, ||, |
-  hl(0, "@keyword.return.bash",           { fg = "#ffaa22", bold = true })   -- return
-  hl(0, "@keyword.conditional.bash",      { fg = "#ffd900", bold = true })   -- if/then/elif/else/fi
-  hl(0, "@keyword.exception.bash",        { fg = "#ffd900", bold = true })   -- try/catch n/a, but reserved
-  hl(0, "@keyword.repeat.bash",           { fg = "#ffd900", bold = true })   -- for/while/until/do/done
-  hl(0, "@keyword.import.bash",           { fg = "#ffaa22", bold = true })   -- source, .
-  hl(0, "@keyword.directive.bash",        { fg = "#ffaa22", bold = true })   -- set -e etc.
+  hl(0, '@keyword.bash', { fg = '#ffaa22' })
+  hl(0, '@keyword.function.bash', { fg = '#ffaa22', bold = true }) -- function
+  hl(0, '@keyword.operator.bash', { fg = '#ffaa22', bold = true }) -- &&, ||, |
+  hl(0, '@keyword.return.bash', { fg = '#ffaa22', bold = true }) -- return
+  hl(0, '@keyword.conditional.bash', { fg = '#ffd900', bold = true }) -- if/then/elif/else/fi
+  hl(0, '@keyword.exception.bash', { fg = '#ffd900', bold = true }) -- try/catch n/a, but reserved
+  hl(0, '@keyword.repeat.bash', { fg = '#ffd900', bold = true }) -- for/while/until/do/done
+  hl(0, '@keyword.import.bash', { fg = '#ffaa22', bold = true }) -- source, .
+  hl(0, '@keyword.directive.bash', { fg = '#ffaa22', bold = true }) -- set -e etc.
   -- Punctuation
-  hl(0, "@punctuation.special.bash",      { fg = "#ffaa22" })   -- $ { } in expansions
-  hl(0, "@punctuation.bracket.bash",      { fg = "#c8c8c8" })   -- ( ) [ ] { }
-  hl(0, "@punctuation.delimiter.bash",    { fg = "#ffaa22" })   -- ; & |
+  hl(0, '@punctuation.special.bash', { fg = '#ffaa22' }) -- $ { } in expansions
+  hl(0, '@punctuation.bracket.bash', { fg = '#c8c8c8' }) -- ( ) [ ] { }
+  hl(0, '@punctuation.delimiter.bash', { fg = '#ffaa22' }) -- ; & |
   -- Operators
-  hl(0, "@operator.bash",                 { fg = "#ff33ee" })
+  hl(0, '@operator.bash', { fg = '#ff33ee' })
   -- Comments
-  hl(0, "@comment.bash",                  { fg = "#a7a7a7" })
-  hl(0, "@spell.bash",                    { fg = "#a7a7a7" })
+  hl(0, '@comment.bash', { fg = '#a7a7a7' })
+  hl(0, '@spell.bash', { fg = '#a7a7a7' })
   -- Special and Builtin
-  hl(0, "@boolean.bash",                  { fg = "#8ccfe6" })   -- n/a for bash, but harmless
-  hl(0, "@constant.builtin.bash",         { fg = "#8ccfe6" })   -- true/false as commands? rare
-  hl(0, "@type.builtin.bash",             { fg = "#8ccfe6" })
-  hl(0, "@function.builtin.bash",         { fg = "#1ebea3" })   -- echo, cd, printf, test
+  hl(0, '@boolean.bash', { fg = '#8ccfe6' }) -- n/a for bash, but harmless
+  hl(0, '@constant.builtin.bash', { fg = '#8ccfe6' }) -- true/false as commands? rare
+  hl(0, '@type.builtin.bash', { fg = '#8ccfe6' })
+  hl(0, '@function.builtin.bash', { fg = '#1ebea3' }) -- echo, cd, printf, test
   -- Command names (the executable being called)
-  hl(0, "@function.bash",                 { fg = "#be69ff" })   -- command names
-  hl(0, "@command.bash",                  { fg = "#be69ff" })   -- fallback alias
+  hl(0, '@function.bash', { fg = '#be69ff' }) -- command names
+  hl(0, '@command.bash', { fg = '#be69ff' }) -- fallback alias
   -- Heredocs / Here-strings
-  hl(0, "@string.heredoc.bash",           { fg = "#95ee98", italic = true })
-  hl(0, "@string.heredoc.delimiter.bash", { fg = "#ffaa22" })
+  hl(0, '@string.heredoc.bash', { fg = '#95ee98', italic = true })
+  hl(0, '@string.heredoc.delimiter.bash', { fg = '#ffaa22' })
   -- Fallback / Normal text
-  hl(0, "@text.bash",                     { fg = "#ffffff" })
+  hl(0, '@text.bash', { fg = '#ffffff' })
+
+  -- Custom: Typst Tree-sitter highlighting overrides
+  -- Markup: headings & text styles
+  hl(0, '@markup.heading.1.typst', { fg = '#7e91e4', bold = true })
+  hl(0, '@markup.heading.marker.typst', { fg = '#ffaa22' })
+  hl(0, '@markup.italic.typst', { fg = '#95ee98', italic = true })
+  hl(0, '@markup.strong.typst', { fg = '#ffaa22', bold = true })
+  hl(0, '@markup.raw.block.typst', { fg = '#a7a7a7' })
+  hl(0, '@markup.raw.inline.typst', { fg = '#95ee98' })
+  hl(0, '@markup.link.typst', { fg = '#8ccfe6', underline = true })
+  hl(0, '@markup.list.typst', { fg = '#ffd900' })
+  hl(0, '@markup.math.typst', { fg = '#ffffff' })
+  -- Keywords (let, if, for, etc.)
+  hl(0, '@keyword.typst', { fg = '#ffaa22' })
+  hl(0, '@keyword.storage.type.typst', { fg = '#ffaa22', bold = true })
+  hl(0, '@keyword.control.conditional.typst', { fg = '#ffd900', bold = true })
+  hl(0, '@keyword.control.repeat.typst', { fg = '#ffd900', bold = true })
+  hl(0, '@keyword.operator.typst', { fg = '#ff33ee' })
+  -- Functions & Calls
+  hl(0, '@function.typst', { fg = '#be69ff' })
+  hl(0, '@function.call.typst', { fg = '#ccb9ff' })
+  hl(0, '@function.method.typst', { fg = '#be69ff' })
+  hl(0, '@function.method.call.typst', { fg = '#ccb9ff' })
+  hl(0, '@function.builtin.typst', { fg = '#1ebea3' })
+  -- Numbers
+  hl(0, '@constant.typst', { fg = '#ccb9ff' })
+  hl(0, '@number.typst', { fg = '#1fc522' })
+  -- Operators
+  hl(0, '@operator.typst', { fg = '#ffffff' })
+  -- Strings
+  hl(0, '@string.typst', { fg = '#95ee98', italic = true })
+  hl(0, '@string.escape.typst', { fg = '#ffaa22' })
+  -- Comments
+  hl(0, '@comment.typst', { fg = '#a7a7a7' })
+  hl(0, '@spell.typst', { fg = '#a7a7a7' })
+  -- Special / builtin
+  hl(0, '@boolean.typst', { fg = '#8ccfe6' })
+  hl(0, '@variable.builtin.typst', { fg = '#8ccfe6' })
+  hl(0, '@type.builtin.typst', { fg = '#8ccfe6' })
+  -- Punctuation
+  hl(0, '@punctuation.special.typst', { fg = '#ffaa22' })
+  -- Custom: highlighting priority
+  vim.treesitter.query.set(
+    'typst',
+    'highlights',
+    [[
+; extends
+((heading) @markup.heading.1.typst
+  (#set! priority 101))
+]]
+  )
 
   -- [[ mini.nvim ]]
   --  A collection of various small independent plugins/modules
@@ -711,9 +753,7 @@ do
   ---@diagnostic disable-next-line: duplicate-set-field
   statusline.section_git = function(args)
     local git_info = original_git(args)
-    if #git_info > max_git_width then
-      return git_info:sub(1, max_git_width - 1) .. '…'
-    end
+    if #git_info > max_git_width then return git_info:sub(1, max_git_width - 1) .. '…' end
     return git_info
   end
 
@@ -852,15 +892,18 @@ do
     { desc = '[S]earch [/] in open files' }
   )
 
-
-vim.keymap.set({ 'n', 'v' }, '<leader>w', function()
-  vim.cmd('cd ' .. vim.fn.expand('%:p:h'))
-  print('Directory: ' .. vim.fn.getcwd())
-end, { desc = 'Set [W]orking directory' })
-
+  vim.keymap.set({ 'n', 'v' }, '<leader>w', function()
+    vim.cmd('cd ' .. vim.fn.expand '%:p:h')
+    print('Directory: ' .. vim.fn.getcwd())
+  end, { desc = 'Set [W]orking directory' })
 
   -- Shortcut for searching your Neovim configuration files
-  vim.keymap.set({ 'n', 'v' }, '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim files' })
+  vim.keymap.set(
+    { 'n', 'v' },
+    '<leader>sn',
+    function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end,
+    { desc = '[S]earch [N]eovim files' }
+  )
 end
 
 -- ============================================================
@@ -961,7 +1004,7 @@ do
       --
       -- This may be unwanted, since they displace some of your code
       if client and client:supports_method('textDocument/inlayHint', event.buf) then
-        map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle inlay [H]ints')
+        map('<leader>h', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, 'Toggle [H]ints')
       end
     end,
   })
@@ -981,14 +1024,25 @@ do
     -- But for many setups, the LSP (`ts_ls`) will work just fine
     -- ts_ls = {},
 
+    tinymist = {
+      settings = {
+        tinymist = {
+          formatterMode = 'typstyle', -- or "typstfmt"
+          exportPdf = 'onSave', -- optional: export PDF on save
+        },
+      },
+      -- Keep semantic tokens disabled to stop highlighting interference
+      on_attach = function(client) client.server_capabilities.semanticTokensProvider = nil end,
+    },
+
     ty = {
       settings = {
         ty = {
           configuration = {
             rules = {
               -- Put your rules here (this must be a map/object, not a list)
-              ["unresolved-reference"] = "warn",
-              ["possibly-unresolved-reference"] = "error",
+              ['unresolved-reference'] = 'warn',
+              ['possibly-unresolved-reference'] = 'error',
               -- add more rules as needed
             },
           },
@@ -997,19 +1051,15 @@ do
       },
 
       -- Keep semantic tokens disabled to stop highlighting interference
-      on_attach = function(client)
-        client.server_capabilities.semanticTokensProvider = nil
-      end,
+      on_attach = function(client) client.server_capabilities.semanticTokensProvider = nil end,
     },
 
     clangd = {
       settings = {
-        clangd = { },
+        clangd = {},
       },
       -- Keep semantic tokens disabled to stop highlighting interference
-      on_attach = function(client)
-        client.server_capabilities.semanticTokensProvider = nil
-      end,
+      on_attach = function(client) client.server_capabilities.semanticTokensProvider = nil end,
     },
 
     bashls = {
@@ -1026,9 +1076,7 @@ do
         },
       },
       -- Keep semantic tokens disabled to stop highlighting interference
-      on_attach = function(client)
-        client.server_capabilities.semanticTokensProvider = nil
-      end,
+      on_attach = function(client) client.server_capabilities.semanticTokensProvider = nil end,
     },
 
     stylua = {}, -- Used to format Lua code
@@ -1073,6 +1121,7 @@ do
     gh 'mason-org/mason.nvim',
     gh 'mason-org/mason-lspconfig.nvim',
     gh 'WhoIsSethDaniel/mason-tool-installer.nvim',
+    gh 'chomosuke/typst-preview.nvim',
   }
 
   -- Automatically install LSPs and related tools to stdpath for Neovim
@@ -1097,8 +1146,37 @@ do
     vim.lsp.enable(name)
   end
 
+  -- typst-preview.nvim: live Typst preview using tinymist under the hood.
+  -- setup() is required: it implicitly runs :TypstPreviewUpdate, which downloads
+  -- the required binaries (tinymist, websocat) into stdpath('data')/typst-preview/
+  -- unless dependencies_bin points at an existing binary.
+  require('typst-preview').setup {
+    -- Reuse the tinymist installed by Mason instead of downloading a separate copy.
+    dependencies_bin = {
+      tinymist = 'tinymist',
+    },
+    follow_cursor = true, -- default: preview scrolls as the cursor moves
+    partial_rendering = true, -- default: only render the visible portion
+  }
+  -- Enable Typst preview toggle key for .typ buffers only
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'typst',
+    callback = function(args)
+      vim.keymap.set({ 'n', 'v' }, '<leader>p', '<cmd>TypstPreview<cr>', {
+        buffer = args.buf,
+        desc = 'Typst [P]review',
+      })
+      vim.keymap.set({ 'n', 'v' }, '<leader>t', '<cmd>TypstPreviewFollowCursorToggle<cr>', {
+        buffer = args.buf,
+        desc = 'Typst [T]rack cursor',
+      })
+      vim.keymap.set({ 'n', 'v' }, '<leader>u', '<cmd>TypstPreviewSyncCursor<cr>', {
+        buffer = args.buf,
+        desc = 'Typst [U]pdate cursor',
+      })
+    end,
+  })
 end
-
 -- ============================================================
 -- SECTION 7: FORMATTING
 -- conform.nvim setup and keymap
@@ -1127,7 +1205,7 @@ do
     formatters_by_ft = {
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
-      python = { "ruff" },
+      python = { 'ruff' },
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -1161,8 +1239,8 @@ do
   require('blink.cmp').setup {
     keymap = {
       preset = 'default',
-      ['<CR>'] = { 'accept', 'fallback' },   -- Enter to confirm first selection
-      ['<Tab>'] = { 'accept', 'snippet_forward', 'fallback' },  -- Tab to confirm first selection
+      ['<CR>'] = { 'accept', 'fallback' }, -- Enter to confirm first selection
+      ['<Tab>'] = { 'accept', 'snippet_forward', 'fallback' }, -- Tab to confirm first selection
       ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
       -- 'default' (recommended) for mappings similar to built-in completions
       --   <c-y> to accept ([y]es) the completion.
@@ -1306,39 +1384,37 @@ do
   -- Install neo-tree
   require 'kickstart.plugins.neo-tree'
   -- Show and hide neo-tree
-  vim.keymap.set("n", "<C-e>", ":Neotree toggle<CR>")
+  vim.keymap.set('n', '<C-e>', ':Neotree toggle<CR>')
   -- or to show current file's location:
   -- vim.keymap.set("n", "<leader>n", ":Neotree reveal<CR>")
   -- Change color
-  vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { fg = "#ffffff" })
-  vim.api.nvim_set_hl(0, "NeoTreeDirectoryIcon", { fg = "#a7a7a7" })
+  vim.api.nvim_set_hl(0, 'NeoTreeDirectoryName', { fg = '#ffffff' })
+  vim.api.nvim_set_hl(0, 'NeoTreeDirectoryIcon', { fg = '#a7a7a7' })
 
-  require("neo-tree").setup({
+  require('neo-tree').setup {
     filesystem = {
       window = {
         mappings = {
-          ["."] = "noop",  -- Disables the default function of `.`
+          ['.'] = 'noop', -- Disables the default function of `.`
         },
       },
     },
-    close_if_last_window = true,  -- Close neo-tree on quit
-  })
+    close_if_last_window = true, -- Close neo-tree on quit
+  }
 
   -- Auto resize split view
-  vim.opt.fillchars:append({ vert = "▕" })
+  vim.opt.fillchars:append { vert = '▕' }
   vim.opt.equalalways = false
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = "neo-tree",
-    callback = function()
-      vim.wo.winfixwidth = true
-    end,
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'neo-tree',
+    callback = function() vim.wo.winfixwidth = true end,
   })
-  vim.api.nvim_create_autocmd("VimResized", {
-    pattern = "*",
+  vim.api.nvim_create_autocmd('VimResized', {
+    pattern = '*',
     callback = function()
       vim.defer_fn(function()
         local cur_win = vim.api.nvim_get_current_win()
-        vim.cmd("wincmd =")
+        vim.cmd 'wincmd ='
         vim.api.nvim_set_current_win(cur_win)
       end, 30)
     end,
@@ -1346,7 +1422,6 @@ do
 
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   -- require 'custom.plugins'
-
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
